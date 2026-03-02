@@ -137,6 +137,6 @@ Repository reviewers, maintainers, and admins can find PR review workflows, merg
 - [Claude Code plugins documentation](https://code.claude.com/docs/en/plugins)
 - [Cursor plugins documentation](https://cursor.com/docs/plugins)
 
-## License
+## Licenses
 
 This project is licensed under the Apache-2.0 License.
