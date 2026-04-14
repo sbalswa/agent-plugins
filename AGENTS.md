@@ -219,7 +219,7 @@ By submitting this pull request, I confirm that you can use, modify, copy, and r
 ```
 
 Replace `<REPO>` with the actual `owner/repo` of the repository the PR is being opened against
-(e.g. `sbalswa/agent-plugins`). **Do not copy the URL from `.claude/settings.json` blindly** —
+(e.g. `awslabs/agent-plugins`). **Do not copy the URL from `.claude/settings.json` blindly** —
 that file hardcodes `awslabs/agent-plugins`, but the CI check uses `${{ github.repository }}`
 which resolves to the current repository. In a fork, these differ and the check will fail even
 if the rest of the attribution text is present.
