@@ -8,6 +8,7 @@ Depending on your role, please review the appropriate guide for repository-speci
 
 - [Development Guide](./docs/DEVELOPMENT_GUIDE.md) - For contributors and developers
 - [Maintainers Guide](./docs/MAINTAINERS_GUIDE.md) - For reviewers, maintainers, and admins
+- [Administrators Guide](./docs/ADMINISTRATORS_GUIDE.md) - For GitHub repository and AWS account setup
 
 **Using Claude Code?** See the [Claude Code Setup](./docs/DEVELOPMENT_GUIDE.md#claude-code-setup) section in the Development Guide for project-specific configuration.
 
@@ -43,7 +44,7 @@ To send us a pull request, please:
 5. Send us a pull request, answering any default questions in the pull request interface.
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
-GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
+GitHub provides additional documentation on [forking a repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and [creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 
 ## Finding Contributions to Work On
 
