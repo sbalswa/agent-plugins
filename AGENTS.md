@@ -4,7 +4,7 @@
 
 ## TL;DR Pitch
 
-This repository supports **plugins** - bundles of skills, MCP servers, and agent configurations that extend capabilities. The `awslabs/agent-plugins` marketplace includes plugins like `deploy-on-aws` (architecture recommendations, cost estimates, and working IaC) and `amazon-location-service` (maps, geocoding, routing, and geospatial features).
+This repository supports **plugins** - bundles of skills, MCP servers, and agent configurations that extend capabilities. The `awslabs/agent-plugins` marketplace includes plugins like `deploy-on-aws` (architecture recommendations, cost estimates, and working IaC), `amazon-location-service` (maps, geocoding, routing, and geospatial features), and `databases-on-aws` (database guidance for the AWS portfolio, starting with Aurora DSQL).
 
 ## Core Concepts
 
@@ -48,20 +48,42 @@ agent-plugins/
 │   │               ├── defaults.md
 │   │               ├── cost-estimation.md
 │   │               └── security.md
-│   └── amazon-location-service/
-│       ├── .claude-plugin/
-│       │   └── plugin.json
-│       ├── .mcp.json
-│       └── skills/
-│           └── amazon-location-service/
-│               ├── SKILL.md
-│               └── references/
+│   ├── amazon-location-service/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── .mcp.json
+│   │   └── skills/
+│   │       └── amazon-location-service/
+│   │           ├── SKILL.md
+│   │           └── references/
+│   ├── databases-on-aws/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── .mcp.json
+│   │   ├── hooks/
+│   │   │   └── hooks.json
+│   │   ├── scripts/
+│   │   └── skills/
+│   │       └── dsql/
+│   │           ├── SKILL.md
+│   │           ├── mcp/
+│   │           └── references/
 ├── schemas/                      # JSON schemas for manifests
 │   ├── marketplace.schema.json
 │   ├── plugin.schema.json
 │   ├── mcp.schema.json
 │   └── skill-frontmatter.schema.json
-├── tools/                        # Lint/validation scripts
+├── tools/                        # Lint, validation, and eval scripts
+│   ├── evals/                    # Eval suites for plugins, kept separate from plugin clients
+│   │   └── databases-on-aws/
+│   │       ├── README.md
+│   │       └── dsql/
+│   │           ├── evals.json
+│   │           ├── trigger_evals.json
+│   │           ├── query_explainability_evals.json
+│   │           ├── safe_query_evals.json
+│   │           └── scripts/
+│   │               └── run_functional_evals.py
 │   ├── validate-cross-refs.cjs
 │   └── ...
 ├── mise.toml                     # Tool versions and tasks
@@ -87,6 +109,13 @@ agent-plugins/
 | --------- | ----- | -------------------------------------- |
 | `aws-mcp` | stdio | AWS documentation and service guidance |
 
+### databases-on-aws
+
+| Server         | Type  | Purpose                                                                          |
+| -------------- | ----- | -------------------------------------------------------------------------------- |
+| `awsknowledge` | HTTP  | AWS documentation, architecture guidance, and best practices                     |
+| `aurora-dsql`  | stdio | Direct database operations — queries, schema, transactions (disabled by default) |
+
 ## Workflow: Deploy Skill
 
 1. **Analyze** - Scan codebase for framework, database, dependencies
@@ -103,15 +132,6 @@ agent-plugins/
 - IaC → CDK TypeScript (most expressive, best IDE support)
 
 Default to **dev sizing** unless user says "production".
-
-## Reference Documentation
-
-See `.claude/docs/` for Claude Code plugin system reference:
-
-- `plugin_overview.md` - Creating plugins
-- `plugin_marketplace_distribution.md` - Marketplace distribution
-- `plugin_reference.md` - Complete technical reference
-- `skills_docs.md` - Skill authoring guide
 
 ## Development commands (mise)
 
@@ -130,8 +150,9 @@ mise run lint:md:fix   # Lint Markdown with auto-fix
 mise run lint:manifests   # Validate JSON manifests (marketplace, plugin, MCP)
 mise run lint:cross-refs  # Validate cross-references between manifests
 mise run lint          # All linters
-mise run security      # All security scans (Bandit, SemGrep, Gitleaks, Checkov, Grype)
-mise run build         # Full build: lint + fmt:check + security
+mise run test          # Run unit tests (pytest for Python; npm/jest when a package.json defines tests)
+mise run security      # All security scans (Bandit, SemGrep, Gitleaks, Checkov, Grype, zizmor)
+mise run build         # Full build: lint + fmt:check + validate + test + security
 ```
 
 See `mise.toml` for the full task list and tool versions.
@@ -154,11 +175,12 @@ claude --plugin-dir ./plugins/deploy-on-aws
 
 ## Git Worktree Workflow
 
-ALWAYS use git worktrees for new work. The main worktree stays on its current branch and is never switched. Each piece of work gets its own worktree under `.tmp/`, branching off the current branch. This enables multiple agents to work in parallel without conflicts.
+ALWAYS use git worktrees for new work. The main worktree stays on its current branch and is never switched. Each piece of work gets its own worktree under `.tmp/`, branching off the latest `origin/main`. This enables multiple agents to work in parallel without conflicts.
 
 ```bash
-# Create a worktree for new work (branches off current branch)
-git worktree add .tmp/<short-name> -b <branch-name>
+# Fast-forward main first, then branch new work off the latest remote
+git pull --ff-only origin main
+git worktree add .tmp/<short-name> -b <branch-name> origin/main
 
 # Create a worktree for an existing branch
 git worktree add .tmp/<short-name> <branch-name>
@@ -175,6 +197,7 @@ All worktrees live under `.tmp/` (already in `.gitignore`).
 ## Boundaries
 
 - ALWAYS use `git worktree add .tmp/<name>` for new work. NEVER switch branches in the main worktree.
+- ONLY fast-forward `main` (`git pull --ff-only`); never commit, merge, or rebase it locally.
 - ALWAYS Use mise commands to interact with the codebase. If a command is not available, add it.
 - NEVER add new dependencies without asking first.
 - ALWAYS run a full build when done with a task, this is to ensure all required files are generated before commit.

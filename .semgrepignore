@@ -1,10 +1,11 @@
 # .semgrepignore - Additional exclusions beyond .gitignore
 # Semgrep automatically respects .gitignore patterns
 
-# Test fixtures and mocks (review separately from production code)
+# Test fixtures, mocks, and eval harnesses (review separately from production code)
 **/test_fixtures/
 **/fixtures/
 **/__mocks__/
+**/evals/**/scripts/
 
 # Lock files (auto-generated, not authored code)
 package-lock.json
@@ -18,3 +19,7 @@ uv.lock
 .gitleaks-baseline.json
 .bandit-baseline.json
 .semgrepignore
+
+# Vendored Semgrep ruleset (RFC #211) — Semgrep must not scan its own rule
+# files (they contain detection regexes that would self-match).
+tools/semgrep/*.yaml
